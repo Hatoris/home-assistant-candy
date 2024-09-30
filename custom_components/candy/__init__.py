@@ -5,6 +5,7 @@ import logging
 from datetime import timedelta
 
 import async_timeout
+import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_IP_ADDRESS, CONF_PASSWORD
@@ -50,6 +51,26 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     hass.data.setdefault(DOMAIN, {})[config_entry.entry_id] = {
         DATA_KEY_COORDINATOR: coordinator
     }
+
+    async def handle_start_program(call):
+        program_key = call.data.get('program_key')
+        option_key = call.data.get('option_key', 'default')
+        await client.start_program(program_key, option_key)
+
+    async def handle_stop_program(call):
+        await client.stop_program()
+
+    hass.services.async_register(
+        'candy', 'start_program', handle_start_program,
+        schema=vol.Schema({
+            vol.Required('program_key'): str,
+            vol.Optional('option_key', default='default'): str,
+        })
+    )
+
+    hass.services.async_register(
+        'candy', 'stop_program', handle_stop_program
+    )
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
