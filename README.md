@@ -1,10 +1,12 @@
 # Candy Home Assistant component
 
-[![Run tests](https://github.com/ofalvai/home-assistant-candy/actions/workflows/test.yml/badge.svg)](https://github.com/ofalvai/home-assistant-candy/actions/workflows/test.yml)
+[![Run tests](https://github.com/hatoris/home-assistant-candy/actions/workflows/test.yml/badge.svg)](https://github.com/hatoris/home-assistant-candy/actions/workflows/test.yml)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![codecov](https://codecov.io/gh/ofalvai/home-assistant-candy/branch/main/graph/badge.svg?token=HE0AIQOGAD)](https://codecov.io/gh/ofalvai/home-assistant-candy)
+[![codecov](https://codecov.io/gh/hatoris/home-assistant-candy/branch/main/graph/badge.svg?token=HE0AIQOGAD)](https://codecov.io/gh/hatoris/home-assistant-candy)
 
 Custom component for [Home Assistant](https://homeassistant.io) that integrates Candy/Haier/Simply-Fi home appliances.
+
+This is a fork of the excellent work of [ofalvai](https://github.com/ofalvai): [https://github.com/ofalvai/home-assistant-candy](https://github.com/ofalvai/home-assistant-candy)
 
 
 ## Features
@@ -28,10 +30,6 @@ Custom component for [Home Assistant](https://homeassistant.io) that integrates 
 
 You need the IP address of the machine and the encryption key. This can be guessed with [CandySimplyFi-tool](https://github.com/MelvinGr/CandySimplyFi-tool).
 
+## This repo add the possibility to control the DishWasher (start/stop)
 
-## My device isn't supported. Can you help?
-
-Yes. If you have an appliance that is not supported yet, or you see an error, head over to the [Discussions section](https://github.com/ofalvai/home-assistant-candy/discussions/categories/device-support-improvements). Open a new thread or comment to an existing one with the following information:
-
-- The status API response of your device (use [CandySimplyFi-tool](https://github.com/MelvinGr/CandySimplyFi-tool) to get the JSON)
-- A brief explanation of what each field means in the response and how it changes based on the device state, eg. _The `SpinSp` field is probably the spin speed divided by 100, I have seen values 6, 8, 10 and 12 in the response_
+Control has been included to allow to send program + option to start the dishwasher or stop it. 
