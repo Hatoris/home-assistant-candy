@@ -19,6 +19,7 @@ UNIQUE_ID_OVEN = "{0}-oven"
 UNIQUE_ID_OVEN_TEMP = "{0}-oven-temp"
 UNIQUE_ID_DISHWASHER = "{0}-dishwasher"
 UNIQUE_ID_DISHWASHER_REMAINING_TIME = "{0}-dishwasher_remaining_time"
+UNIQUE_ID_DISHWASHER_PROGRAM = "{0}-dishwasher_current_program"
 
 DEVICE_NAME_WASHING_MACHINE = "Washing machine"
 DEVICE_NAME_TUMBLE_DRYER = "Tumble dryer"
