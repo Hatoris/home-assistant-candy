@@ -1,3 +1,4 @@
+
 from abc import abstractmethod
 from typing import Any, Mapping
 
@@ -11,7 +12,7 @@ from homeassistant.helpers.update_coordinator import (CoordinatorEntity,
                                                       DataUpdateCoordinator)
 
 from .client import WashingMachineStatus
-from .client.model import (DishwasherState, DishwasherStatus,
+from .client.model import (DishwasherState, DishwasherProgram, DishwasherStatus, DishwasherOptionProgram,
                            DryerProgramState, MachineState, OvenStatus,
                            TumbleDryerStatus)
 from .const import *
@@ -43,7 +44,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
     elif isinstance(coordinator.data, DishwasherStatus):
         async_add_entities([
             CandyDishwasherSensor(coordinator, config_id),
-            CandyDishwasherRemainingTimeSensor(coordinator, config_id)
+            CandyDishwasherProgramSensor(coordinator, config_id),
+            CandyDishwasherRemainingTimeSensor(coordinator, config_id),
+            
         ])
     else:
         raise Exception(f"Unable to determine machine type: {coordinator.data}")
@@ -405,6 +408,35 @@ class CandyDishwasherSensor(CandyBaseSensor):
 
         return attributes
 
+
+class CandyDishwasherProgramSensor(CandyBaseSensor):
+
+    def device_name(self) -> str:
+        return DEVICE_NAME_DISHWASHER
+
+    def suggested_area(self) -> str:
+        return SUGGESTED_AREA_KITCHEN
+
+    @property
+    def name(self) -> str:
+        return "Dishwasher Current program"
+
+    @property
+    def unique_id(self) -> str:
+        return UNIQUE_ID_DISHWASHER_PROGRAM.format(self.config_id)
+
+    @property
+    def state(self) -> StateType:
+        status: DishwasherStatus = self.coordinator.data
+        return str(status.program)
+
+    @property
+    def icon(self) -> str:
+        return "mdi:view-list"
+
+    @property
+    def extra_state_attributes(self) -> Mapping[str, Any]:
+        return {program.code:program.label for program in DishwasherProgram}
 
 class CandyDishwasherRemainingTimeSensor(CandyBaseSensor):
 
