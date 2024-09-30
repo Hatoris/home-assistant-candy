@@ -1,0 +1,52 @@
+# Control 
+type: vertical-stack
+cards:
+  - type: entities
+    entities:
+      - entity: input_select.dishwasher_program
+        name: Select Program
+      - entity: input_select.dishwasher_option
+        name: Select Option
+  - type: horizontal-stack
+    cards:
+      - type: button
+        entity: script.start_dishwasher
+        name: Start
+        icon: mdi:play
+        tap_action:
+          action: call-service
+          service: script.start_dishwasher
+      - type: button
+        entity: script.stop_dishwasher
+        name: Stop
+        icon: mdi:stop
+        tap_action:
+          action: call-service
+          service: script.stop_dishwashe
+
+# Infos 
+
+type: vertical-stack
+cards:
+  - type: entity
+    entity: sensor.dishwasher_current_program
+    name: Program
+  - type: entity
+    entity: sensor.dishwasher
+    name: Status
+  - type: entity
+    entity: sensor.dishwasher
+    attribute: door_open
+    name: Porte Ouverte
+  - type: entity
+    entity: sensor.dishwasher
+    attribute: remaining_minutes
+    name: Temps restant
+    unit: min
+  - type: entity
+    entity: sensor.dishwasher
+    attribute: remote_control
+    name: Contrôle à distance
+  - type: entity
+    entity: sensor.dishwasher_remaining_time
+    name: Temps restant 2
