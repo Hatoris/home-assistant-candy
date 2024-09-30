@@ -50,6 +50,13 @@ def decrypt(key: bytes, encrypted_response: bytes) -> bytes:
         decrypted.append(byte ^ key[i % key_len])
     return bytes(decrypted)
 
+def encrypt(key : bytes, response: bytes) -> bytes:
+    key_len = len(key)
+    encrypted: list[int] = []
+    for (i,byte) in enumerate(response):
+        encrypted.append(byte ^ key[i % key_len])
+    return bytes(encrypted)
+
 
 def _find_candidate_key_codepoints(encrypted_response: bytes, key_offset: int) -> Iterable[int]:
     bytes_to_check: bytes = encrypted_response[key_offset::KEY_LEN]
