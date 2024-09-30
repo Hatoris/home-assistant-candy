@@ -9,9 +9,9 @@ from aiohttp import ClientSession
 
 from aiolimiter import AsyncLimiter
 
-from .decryption import decrypt, Encryption, find_key
+from .decryption import decrypt, Encryption, find_key, encrypt
 from .model import (DishwasherStatus, OvenStatus, TumbleDryerStatus,
-                    WashingMachineStatus)
+                    WashingMachineStatus, DishwasherOptionProgram, DishwasherProgram)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,6 +20,21 @@ _LOGGER = logging.getLogger(__name__)
 # https://github.com/ofalvai/home-assistant-candy/issues/61
 _LIMITER = AsyncLimiter(max_rate=1, time_period=3)
 
+PROGRAMS = {
+    'pre_wash': {'Program': 'P12', 'w1': '4'},
+    'intensive_75': {'Program': 'P2', 'w1': '1'},
+    'universal_60': {'Program': 'P5', 'w1': '2'},
+    'eco_45': {'Program': 'P8', 'w1': '3'},
+    'total_care_50': {'Program': 'P13', 'w1': '5'},
+}
+
+OPTIONS = {
+    'default': {'OpzProg': '0'},
+    '3_in_1_only': {'OpzProg': '8'},
+    '3_in_1_half_load': {'OpzProg': '10'},
+    '3_in_1_extra_dry': {'OpzProg': '9'},
+    '3_in_1_eco': {'OpzProg': '12'},
+}
 
 class CandyClient:
 
@@ -63,6 +78,62 @@ class CandyClient:
 
             return status
 
+    async def send_command(self, command_params: dict) -> None:
+        url = f"http://{self.device_ip}/http-write.json"
+
+        if self.use_encryption and self.encryption_key:
+            command_json = '&'.join(f"{key}={value}" for key, value in command_params.items())
+            _LOGGER.debug(f"Sending command to {self.device_ip}: {command_json}")
+            encrypted_command = encrypt(self.encryption_key.encode(), command_json.encode())
+            encrypted_hex = encrypted_command.hex()
+            _LOGGER.debug(f"Encrypted command: {encrypted_hex}")
+            full_url = f"{url}?encrypted=1&data={encrypted_hex}"
+            _LOGGER.info(f"Full url: {full_url}")
+        else:
+            query_string = '&'.join(f"{key}={value}" for key, value in command_params.items())
+            full_url = f"{url}?{query_string}&encrypted=0"
+
+        async with _LIMITER, self.session.get(full_url) as resp:
+            resp_text = await resp.json(content_type="text/html")
+            _LOGGER.info(f"Command response: {resp_text}")
+
+    async def start_program(
+            self,
+            program_key: str,
+            option_key: str = 'default',
+            delay_start: int = 0,
+            extra_dry: int = 0,
+            open_door_opt: int = 0,
+            trein_uno: int = 0,
+            meta_carico: int = 0,
+            start_stop: int = 1
+        ) -> None:
+            program = PROGRAMS.get(program_key)
+            option = OPTIONS.get(option_key)
+
+            _LOGGER.info(f"start_program - {program_key=}, {option_key=}, {program=}, {option=}")
+
+            if not program:
+                raise ValueError(f"Invalid program key: {program_key}")
+            if not option:
+                raise ValueError(f"Invalid option key: {option_key}")
+
+            params = {
+                'DelayStart': delay_start,
+                'ExtraDry': extra_dry,
+                'OpenDoorOpt': open_door_opt,
+                'TreinUno': trein_uno,
+                'MetaCarico': meta_carico,
+                'StartStop': start_stop,
+            }
+            params.update(program)
+            params.update(option)
+
+            await self.send_command(params)
+
+    async def stop_program(self) -> None:
+        params = {'Reset': '1'}
+        await self.send_command(params)
 
 async def detect_encryption(session: aiohttp.ClientSession, device_ip: str) -> Tuple[Encryption, Optional[str]]:
     # noinspection PyBroadException
