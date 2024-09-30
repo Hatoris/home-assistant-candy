@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 
 
 class StatusCode(Enum):
-    def __init__(self, code: int, label: str):
+    def __init__(self, code: Union[int, str], label: str):
         self.code = code
         self.label = label
 
@@ -12,7 +12,7 @@ class StatusCode(Enum):
         return self.label
 
     @classmethod
-    def from_code(cls, code: int):
+    def from_code(cls, code: Union[int, str]):
         for state in cls:
             if code == state.code:
                 return state
@@ -60,7 +60,7 @@ class WashingMachineStatus:
     def from_json(cls, json):
         return cls(
             machine_state=MachineState.from_code(int(json["MachMd"])),
-            program_state=WashProgramState.from_code(int(json["PrPh"])),
+            program_state=WashProgramState.from_code(int(json["StatoDWash"])),
             program=int(json["Pr"]) if "Pr" in json else int(json["PrNm"]),
             program_code=int(json["PrCode"]) if "PrCode" in json else None,
             temp=int(json["Temp"]),
@@ -131,6 +131,29 @@ class DishwasherState(StatusCode):
     FINISHED = (5, "Finished")
 
 
+class DishwasherProgram(StatusCode):
+    """
+    Dishwashers have a single state combining the machine state and program state
+    """
+
+    PRE_WASH = ("P12", "Pre-wash")
+    INTENSIVE_75 = ("P2", "Intensive 75°C")
+    UNIVERSAL_60 = ("P5", "Universal 60°C")
+    ECO_45 = ("P8", "Eco 45°C")
+    TOTAL_CARE_50 = ("P13", "Total Care 50°C")
+    NOT_SET = ("P0", "Program not set")
+
+class DishwasherOptionProgram(StatusCode):
+    """
+    Dishwashers have a single state combining the machine state and program state
+    """
+
+    DEFAULT = ("0", "Default")
+    ONLY_3_in_1 = ("8", "3-in-1 only")
+    HALF_LOAD_3_in_1 = ("10", "3-in-1 and half-load")
+    EXTRA_DRY_3_in_1 = ("9", "3-in-1 and extra-dry")
+    ECO_3_in_1 = ("12", "3-in-1 and eco")
+
 @dataclass
 class DishwasherStatus:
     machine_state: DishwasherState
@@ -148,7 +171,7 @@ class DishwasherStatus:
     def from_json(cls, json):
         return cls(
             machine_state=DishwasherState.from_code(int(json["StatoDWash"])),
-            program=DishwasherStatus.parse_program(json),
+            program=DishwasherProgram.from_code(json["Program"]),
             remaining_minutes=int(json["RemTime"]),
             delayed_start_hours=int(json["DelayStart"]) if json["DelayStart"] != "0" else None,
             door_open=json["OpenDoor"] != "0",
@@ -159,21 +182,6 @@ class DishwasherStatus:
             rinse_aid_empty=json["MissRinse"] == "1"
         )
 
-    @staticmethod
-    def parse_program(json) -> str:
-        """
-        Parse final program label, like P1, P1+, P1-
-        """
-        program = json["Program"]
-        # Some dishwashers don't include the OpzProg field
-        option = json.get("OpzProg")
-        if option == "p":
-            return program + "+"
-        elif option == "m":
-            return program + "-"
-        else:
-            # Third OpzProg value is 0
-            return program
 
 
 class OvenState(StatusCode):
