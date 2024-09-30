@@ -1,8 +1,8 @@
 # Candy Home Assistant component
 
-[![Run tests](https://github.com/hatoris/home-assistant-candy/actions/workflows/test.yml/badge.svg)](https://github.com/hatoris/home-assistant-candy/actions/workflows/test.yml)
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![codecov](https://codecov.io/gh/hatoris/home-assistant-candy/branch/main/graph/badge.svg?token=HE0AIQOGAD)](https://codecov.io/gh/hatoris/home-assistant-candy)
+[comment]: <> [![Run tests](https://github.com/hatoris/home-assistant-candy/actions/workflows/test.yml/badge.svg)](https://github.com/hatoris/home-assistant-candy/actions/workflows/test.yml)
+[comment]: <> [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[comment]: <> [![codecov](https://codecov.io/gh/hatoris/home-assistant-candy/branch/main/graph/badge.svg?token=HE0AIQOGAD)](https://codecov.io/gh/hatoris/home-assistant-candy)
 
 Custom component for [Home Assistant](https://homeassistant.io) that integrates Candy/Haier/Simply-Fi home appliances.
 
