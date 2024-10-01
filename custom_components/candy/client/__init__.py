@@ -93,9 +93,12 @@ class CandyClient:
             query_string = '&'.join(f"{key}={value}" for key, value in command_params.items())
             full_url = f"{url}?{query_string}&encrypted=0"
 
-        async with _LIMITER, self.session.get(full_url) as resp:
-            resp_text = await resp.json(content_type="text/html")
-            _LOGGER.info(f"Command response: {resp_text}")
+        try:
+            async with _LIMITER, self.session.get(full_url) as resp:
+                resp_text = await resp.text()
+                _LOGGER.info(f"Command response: {resp_text}")
+        except Exception as e:
+            _LOGGER.error(f"Error sending commond: {e}")
 
     async def start_program(
             self,
